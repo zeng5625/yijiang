@@ -55,6 +55,38 @@ public class PathManager : SingleLetonManager<PathManager>
             return uirootpath;
         }
     }
+
+    /// <summary>
+    /// 建筑文件名称
+    /// </summary>
+    private string architecturename = "architecture.txt";
+    public string Architecturename
+    {
+        set 
+        {
+            architecturename = value;
+        }
+        get
+        {
+            return architecturename;
+        }
+    }
+
+    /// <summary>
+    /// 实施内容文件名称
+    /// </summary>
+    private string impname = "imp.txt";
+    public string Impname
+    {
+        set
+        {
+            Impname = value;
+        }
+        get
+        {
+            return Impname;
+        }
+    }
     #endregion
 
     #region 路径管理器函数

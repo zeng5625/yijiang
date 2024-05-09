@@ -1,9 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Sirenix.OdinInspector;
 using UnityEngine.UI;
 using TMPro;
+using Sirenix.OdinInspector;
+using static UnityEditor.Progress;
 
 /// <summary>
 /// 实施内容编辑面板
@@ -12,67 +12,63 @@ public class EditorImpUIPanel : UIBase
 {
     #region 实施内容编辑面板字段
     #region 建筑编辑字段
-    /// <summary>
-    /// 建筑配置数据保存路径按钮
-    /// </summary>
+    [HideLabel]
+    [LabelText("建筑配置数据保存路径按钮")]
     public Button ArchitectureDataSavePathButton;
 
-    /// <summary>
-    /// 建筑配置数据保存路径文本
-    /// </summary>
+    [HideLabel]
+    [LabelText("建筑配置数据保存路径文本")]
     public TextMeshProUGUI ArchitectureDataSavePathText;
 
-    /// <summary>
-    /// 建筑保存按钮
-    /// </summary>
+    [HideLabel]
+    [LabelText("建筑保存按钮")]
     public Button ArchitectureSaveButton;
 
-    /// <summary>
-    /// 建筑还原按钮
-    /// </summary>
+    [HideLabel]
+    [LabelText("建筑还原按钮")]
     public Button ArchitectureRestoreButton;
 
-    /// <summary>
-    /// 建筑清除按钮
-    /// </summary>
+    [HideLabel]
+    [LabelText("建筑清除按钮")]
     public Button ArchitectureClearButton;
 
-    /// <summary>
-    /// 建筑回退按钮
-    /// </summary>
+    [HideLabel]
+    [LabelText("建筑回退按钮")]
     public Button ArchitectureRollbackButton;
+
+    [HideLabel]
+    [LabelText("建筑Trans的父级物体")]
+    public RectTransform ArchitectureTransParent;
     #endregion
 
     #region 实施内容字段
-    /// <summary>
-    /// 实施内容配置数据保存路径按钮
-    /// </summary>
+    [HideLabel]
+    [LabelText("实施内容配置数据保存路径按钮")]
     public Button ImpelentDataSavePathButton;
 
-    /// <summary>
-    /// 实施内容配置数据保存路径文本
-    /// </summary>
+    [HideLabel]
+    [LabelText("实施内容配置数据保存路径文本")]
     public TextMeshProUGUI ImpelentDataSavePathText;
 
-    /// <summary>
-    /// 建筑保存按钮
-    /// </summary>
+    [HideLabel]
+    [LabelText("建筑保存按钮")]
     public Button ImpelentSaveButton;
 
-    /// <summary>
-    /// 建筑还原按钮
-    /// </summary>
+    [HideLabel]
+    [LabelText("建筑还原按钮")]
     public Button ImpelentRestoreButton;
 
-    /// <summary>
-    /// 建筑清除按钮
-    /// </summary>
+    [HideLabel]
+    [LabelText("建筑清除按钮")]
     public Button ImpelentClearButton;
 
-    /// <summary>
-    /// 建筑回退按钮
-    /// </summary>
+    [HideLabel]
+    [LabelText("建筑回退按钮")]
     public Button ImpelentRollbackButton;
+
+    [HideLabel]
+    [LabelText("建筑Trans的父级物体")]
+    public RectTransform ImppletentTransParent;
     #endregion
 
     #endregion
@@ -137,7 +133,26 @@ public class EditorImpUIPanel : UIBase
     /// </summary>
     private void OnArchitectureSaveButtonClick()
     {
-        
+        ArchitectureItem[] architectures = ArchitectureTransParent.GetComponentsInChildren<ArchitectureItem>();
+        if(architectures!=null&&architectures.Length>0)
+        {
+            for (int i = 0; i < architectures.Length; i++)
+            {
+                architectureItemData data=new architectureItemData();
+                data.ArchitectureName = architectures[i].ArchitectureName;
+                data.ArchitectureIcon = architectures[i].architectureIcon.name;
+                data.ArchitectureIndex = architectures[i].ArchitectureIndex;
+                data.TransPosX = architectures[i].rectTrans.anchoredPosition.x;
+                data.TransPosY= architectures[i].rectTrans.anchoredPosition.y;
+                data.TransScaleWith = architectures[i].rectTrans.sizeDelta.x;
+                data.TransScaleHight = architectures[i].rectTrans.sizeDelta.y;
+                DataManager.Instance.ImpConfigData.AddarchitectureCondfigListData(data);
+            }
+        }
+        if (!string.IsNullOrEmpty(ArchitectureDataSavePathText.text))
+        {
+            DataManager.Instance.WriteFile(ArchitectureDataSavePathText.text + PathManager.Instance.Architecturename, DataManager.Instance.ImpConfigData);
+        }
     }
 
     /// <summary>
@@ -145,7 +160,14 @@ public class EditorImpUIPanel : UIBase
     /// </summary>
     private void OnArchitectureRestoreButtonClick()
     {
+        if (!string.IsNullOrEmpty(ArchitectureDataSavePathText.text) && DataManager.Instance.ImpConfigData != null)
+        {
+            DataManager.Instance.ImpConfigData.ArchitectureCondfigList = DataManager.Instance.ReadFile<List<architectureItemData>>(ArchitectureDataSavePathText.text + PathManager.Instance.Architecturename);
+            if (DataManager.Instance.ImpConfigData.ArchitectureCondfigList != null)
+            {
 
+            }
+        }
     }
 
     /// <summary>
@@ -153,7 +175,18 @@ public class EditorImpUIPanel : UIBase
     /// </summary>
     private void OnArchitectureClearButtonClick()
     {
-
+        DataManager.Instance.ImpConfigData.ClearAllarchitectureCondfigList();
+        if(ArchitectureTransParent)
+        {
+            ArchitectureItem[] items=ArchitectureTransParent.GetComponentsInChildren<ArchitectureItem>();
+            if(items!=null&&items.Length>0)
+            {
+                foreach(ArchitectureItem item in items) 
+                {
+                    DestroyImmediate(item.gameObject);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -161,7 +194,12 @@ public class EditorImpUIPanel : UIBase
     /// </summary>
     private void OnArchitectureRollbackButtonClick()
     {
-
+        DataManager.Instance.ImpConfigData.RemoveLastarchitectureCondfigListData();
+        ArchitectureItem[] items = ArchitectureTransParent.GetComponentsInChildren<ArchitectureItem>();
+        if (items != null && items.Length > 0)
+        {
+            DestroyImmediate(items[items.Length-1].gameObject);
+        }
     }
     #endregion
 
@@ -179,7 +217,21 @@ public class EditorImpUIPanel : UIBase
     /// </summary>
     private void OnImpelentSaveButtonClick()
     {
-
+        if(!string.IsNullOrEmpty(ImpelentDataSavePathText.text))
+        {
+            ArchitectureItem[] architectures = ArchitectureTransParent.GetComponentsInChildren<ArchitectureItem>();
+            if (architectures != null && architectures.Length > 0)
+            {
+                for (int i = 0; i < architectures.Length; i++)
+                {
+                    implementItemData data = new implementItemData();
+                    data.ImpName = architectures[i].ArchitectureName;
+                    data.ImpIndex = architectures[i].ArchitectureIndex;
+                    DataManager.Instance.ImpConfigData.AddImpCondfigListData(data);
+                }
+            }
+            DataManager.Instance.WriteFile(ImpelentDataSavePathText.text+PathManager.Instance.Impname,DataManager.Instance.ImpConfigData);
+        }
     }
 
     /// <summary>
@@ -187,7 +239,14 @@ public class EditorImpUIPanel : UIBase
     /// </summary>
     private void OnImpelentRestoreButtonClick()
     {
+        if (!string.IsNullOrEmpty(ImpelentDataSavePathText.text)&& DataManager.Instance.ImpConfigData!=null)
+        {
+            DataManager.Instance.ImpConfigData.ImpConfigList = DataManager.Instance.ReadFile<List<implementItemData>>(ImpelentDataSavePathText.text + PathManager.Instance.Impname);
+            if(DataManager.Instance.ImpConfigData.ImpConfigList != null)
+            {
 
+            }
+        }
     }
 
     /// <summary>
@@ -195,6 +254,7 @@ public class EditorImpUIPanel : UIBase
     /// </summary>
     private void OnImpelentClearButtonClick()
     {
+        DataManager.Instance.ImpConfigData.ClearAllImpConfigList();
 
     }
 
@@ -203,6 +263,7 @@ public class EditorImpUIPanel : UIBase
     /// </summary>
     private void OnImpelentRollbackButtonClick()
     {
+        DataManager.Instance.ImpConfigData.RemoveLastImpConfigListData();
 
     }
     #endregion
