@@ -33,6 +33,17 @@ public class Tools:SingleLetonManager<Tools>
         }
         return obj;
     }
+
+    /// <summary>
+    /// 根据绝对路径加载图片
+    /// </summary>
+    /// <param name="iconName"></param>
+    /// <returns></returns>
+    public Sprite LoadSpriteByPath(string iconpath)
+    {
+        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(iconpath);
+        return sprite;
+    }
     #endregion
 }
 

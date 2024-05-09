@@ -7,24 +7,12 @@ using Sirenix.OdinInspector;
 /// <summary>
 /// 建筑Item类
 /// </summary>
-public class ArchitectureItem : UIBase
+public class ArchitectureItem : ArchitectureConfigItem
 {
     #region 建筑Item类字段
     [HideLabel]
-    [LabelText("建筑名称")]
-    public string ArchitectureName;
-
-    [HideLabel]
-    [LabelText("建筑编号")]
-    public int ArchitectureIndex;
-
-    [HideLabel]
     [LabelText("建筑Trans信息")]
     public RectTransform rectTrans;
-
-    [HideLabel]
-    [LabelText("建筑图标")]
-    public Image architectureIcon;
 
     [HideLabel]
     [LabelText("拖拽组件")]

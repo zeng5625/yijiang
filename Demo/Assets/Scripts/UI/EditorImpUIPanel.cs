@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Sirenix.OdinInspector;
-using static UnityEditor.Progress;
 
 /// <summary>
 /// 实施内容编辑面板
@@ -11,6 +10,67 @@ using static UnityEditor.Progress;
 public class EditorImpUIPanel : UIBase
 {
     #region 实施内容编辑面板字段
+    #region 实施内容编辑左部字段
+    [HideLabel]
+    [LabelText("建筑视图箭头按钮")]
+    public Button ArchitectureViewArrowButton;
+
+    [HideLabel]
+    [LabelText("建筑视图箭头图标")]
+    public Image ArchitectureArrowIcon;
+
+    [HideLabel]
+    [LabelText("建筑视图组件")]
+    public ScrollRect ArchitectureRect;
+
+    [HideLabel]
+    [LabelText("图标视图箭头按钮")]
+    public Button IconViewArrowButton;
+
+    [HideLabel]
+    [LabelText("图标箭头图标")]
+    public Image IconArrowIcon;
+
+    [HideLabel]
+    [LabelText("图标视图组件")]
+    public ScrollRect IconRect;
+
+    [HideLabel]
+    [LabelText("实施内容试图箭头按钮")]
+    public Button ImpViewArrowButton;
+
+    [HideLabel]
+    [LabelText("实施内容箭头图标")]
+    public Image ImpArrowIcon;
+
+    [HideLabel]
+    [LabelText("实施内容视图组件")]
+    public ScrollRect ImpRect;
+
+    [HideLabel]
+    [LabelText("向右箭头")]
+    public Sprite rightArrow;
+
+    [HideLabel]
+    [LabelText("向下箭头")]
+    public Sprite downArrow;
+
+    /// <summary>
+    /// 建筑箭头是否点击
+    /// </summary>
+    private bool Architectureclick;
+
+    /// <summary>
+    /// 图标箭头是否点击
+    /// </summary>
+    private bool Iconclick;
+
+    /// <summary>
+    /// 实施箭头是否点击
+    /// </summary>
+    private bool Impclick;  
+    #endregion
+
     #region 建筑编辑字段
     [HideLabel]
     [LabelText("建筑配置数据保存路径按钮")]
@@ -39,6 +99,10 @@ public class EditorImpUIPanel : UIBase
     [HideLabel]
     [LabelText("建筑Trans的父级物体")]
     public RectTransform ArchitectureTransParent;
+
+    [HideLabel]
+    [LabelText("建筑显示部分的Item")]
+    public ArchitectureItem architectureItem;
     #endregion
 
     #region 实施内容字段
@@ -76,6 +140,18 @@ public class EditorImpUIPanel : UIBase
     protected override void Awake()
     {
         base.Awake();
+        if(ArchitectureViewArrowButton!=null)
+        {
+            ArchitectureViewArrowButton.onClick.AddListener(OnArchitectureViewArrowButtonClick);
+        }
+        if (IconViewArrowButton != null)
+        {
+            IconViewArrowButton.onClick.AddListener(OnIconViewArrowButtonClick);
+        }
+        if (ImpViewArrowButton != null)
+        {
+            ImpViewArrowButton.onClick.AddListener(OnImpViewArrowButtonClick);
+        }
         if (ArchitectureDataSavePathButton != null ) 
         {
             ArchitectureDataSavePathButton.onClick.AddListener(OnArchitectureDataSavePathButtonClick);
@@ -119,6 +195,67 @@ public class EditorImpUIPanel : UIBase
     }
 
     #region 实施内容编辑面板函数
+    #region 实施内容左部函数
+    /// <summary>
+    /// 建筑视图箭头点击事件
+    /// </summary>
+    public void OnArchitectureViewArrowButtonClick()
+    {
+        Architectureclick = !Architectureclick;
+        if (Architectureclick) 
+        {
+            ArchitectureArrowIcon.sprite=downArrow;
+            ArchitectureRect.gameObject.SetActive(true);
+            ArchitectureViewArrowButton.transform.localRotation = Quaternion.identity;
+        }
+        else
+        {
+            ArchitectureArrowIcon.sprite=rightArrow;
+            ArchitectureRect.gameObject.SetActive(false);
+            ArchitectureViewArrowButton.transform.localRotation = Quaternion.Euler(0, 0, 180);
+        }
+    }
+
+    /// <summary>
+    /// 图标视图箭头点击事件
+    /// </summary>
+    public void OnIconViewArrowButtonClick()
+    {
+        Iconclick = !Iconclick;
+        if (Iconclick)
+        {
+            IconArrowIcon.sprite = downArrow;
+            IconRect.gameObject.SetActive(true);
+            IconViewArrowButton.transform.localRotation = Quaternion.identity;
+        }
+        else
+        {
+            IconArrowIcon.sprite = rightArrow;
+            IconRect.gameObject.SetActive(false);
+            IconViewArrowButton.transform.localRotation = Quaternion.Euler(0, 0, 180);
+        }
+    }
+
+    /// <summary>
+    /// 实施内容视图箭头点击事件
+    /// </summary>
+    public void OnImpViewArrowButtonClick()
+    {
+        Impclick = !Impclick;
+        if (Impclick)
+        {
+            ImpArrowIcon.sprite = downArrow;
+            ImpRect.gameObject.SetActive(true);
+            ImpViewArrowButton.transform.localRotation = Quaternion.identity;
+        }
+        else
+        {
+            ImpArrowIcon.sprite = rightArrow;
+            ImpRect.gameObject.SetActive(false);
+            ImpViewArrowButton.transform.localRotation = Quaternion.Euler(0, 0, 180);
+        }
+    }
+    #endregion
     #region 建筑编辑函数
     /// <summary>
     /// 建筑数据保存路径点击事件
@@ -162,11 +299,28 @@ public class EditorImpUIPanel : UIBase
     {
         if (!string.IsNullOrEmpty(ArchitectureDataSavePathText.text) && DataManager.Instance.ImpConfigData != null)
         {
-            DataManager.Instance.ImpConfigData.ArchitectureCondfigList = DataManager.Instance.ReadFile<List<architectureItemData>>(ArchitectureDataSavePathText.text + PathManager.Instance.Architecturename);
-            if (DataManager.Instance.ImpConfigData.ArchitectureCondfigList != null)
+            List<architectureItemData> list= DataManager.Instance.ReadFile<List<architectureItemData>>(ArchitectureDataSavePathText.text + PathManager.Instance.Architecturename);
+            if (list != null&& list.Count>0)
             {
-
+                for (int i = 0;i<list.Count;++i)
+                {
+                    architectureItemData data = list[i];
+                    if (data != null&&ArchitectureTransParent&& architectureItem) 
+                    {
+                        ArchitectureItem item=Instantiate(architectureItem,ArchitectureTransParent);
+                        if (item)
+                        {
+                            item.ArchitectureName = data.ArchitectureName;
+                            item.ArchitectureIndex = data.ArchitectureIndex;
+                            item.rectTrans.localPosition = new Vector2(data.TransPosX,data.TransPosY);
+                            item.rectTrans.sizeDelta = new Vector2(data.TransScaleWith,data.TransScaleHight);
+                            item.architectureIcon.sprite=Tools.Instance.LoadSpriteByPath(PathManager.Instance.ArchitectureIconFolderPath+data.ArchitectureIcon);
+                            item.gameObject.SetActive(true);
+                        }
+                    }
+                }
             }
+            DataManager.Instance.ImpConfigData.ArchitectureCondfigList = list;
         }
     }
 

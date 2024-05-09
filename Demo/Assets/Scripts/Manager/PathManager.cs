@@ -73,6 +73,22 @@ public class PathManager : SingleLetonManager<PathManager>
     }
 
     /// <summary>
+    /// 建筑图标文件夹路径
+    /// </summary>
+    private string architectureIconFolderPath = "Assets/Textures/UI/Architecture/";
+    public string ArchitectureIconFolderPath
+    {
+        set
+        {
+            architectureIconFolderPath = value;
+        }
+        get
+        {
+            return architectureIconFolderPath;
+        }
+    }
+
+    /// <summary>
     /// 实施内容文件名称
     /// </summary>
     private string impname = "imp.txt";
